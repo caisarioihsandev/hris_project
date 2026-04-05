@@ -1,0 +1,154 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+
+<h2>Data Karyawan</h2>
+
+<button class="btn-add" onclick="openModal()">+ Tambah Karyawan</button>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nama</th>
+            <th>Jabatan</th>
+            <th>Kode</th>
+            <th>Gaji</th>
+            <th>Tunjangan Jabatan</th>
+            <th>Tunjangan Makan</th>
+            <th>Tunjangan Transport</th>
+            <th>Premi Kehadiran</th>
+            <th>Aksi</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for emp in employees %}
+        <tr>
+            <td>{{ emp.nama }}</td>
+            <td>{{ emp.jabatan }}</td>
+            <td>{{ emp.kode }}</td>
+            <td>{{ emp.gaji_pokok|rupiah }}</td>
+            <td>{{ emp.tunj_jabatan|rupiah }}</td>
+            <td>{{ emp.tunj_makan|rupiah }}</td>
+            <td>{{ emp.tunj_transport|rupiah }}</td>
+            <td>{{ emp.premi_kehadiran|rupiah }}/hari</td>
+            <td>
+                <button onclick="editEmployee(this)"
+                data-id="{{ emp.id }}"
+                data-nama="{{ emp.nama }}"
+                data-jabatan="{{ emp.jabatan }}"
+                data-kode="{{ emp.kode }}"
+                data-gaji_pokok="{{ emp.gaji_pokok|int }}"
+                data-tunj_jabatan="{{ emp.tunj_jabatan|int }}"
+                data-tunj_makan="{{ emp.tunj_makan|int }}"
+                data-tunj_transport="{{ emp.tunj_transport|int }}"
+                data-premi_kehadiran="{{ emp.premi_kehadiran|int }}">
+                    Edit
+                </button>
+                <a href="/employees/delete/{{ emp.id }}" onclick="return confirm('Hapus data?')">Hapus</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- MODAL -->
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <h3 id="modal-title">Tambah Karyawan</h3>
+
+        <form method="POST" action="/employees/save" class="form-container">
+            <input type="hidden" name="id" id="emp_id">
+
+            <input type="text" name="nama" id="nama" placeholder="Nama" required>
+            <input type="text" name="jabatan" id="jabatan" placeholder="Jabatan" required>
+            <select name="kode" id="kode" required>
+                <option value="">-- Pilih Kode --</option>
+                <option value="EX1">EX1</option>
+                <option value="EX2">EX2</option>                
+                <option value="EX3">EX3</option>
+                <option value="MG1">MG1</option>
+                <option value="MG2">MG2</option>                
+                <option value="MG3">MG3</option>
+                <option value="SP1">SP1</option>
+                <option value="SP2">SP2</option>
+                <option value="SS1">SS1</option>          
+                <option value="SS2">SS2</option>
+            </select>
+            <input type="text" name="gaji_pokok" id="gaji_pokok" placeholder="Gaji Pokok" required>
+            <input type="text" name="tunj_jabatan" id="tunj_jabatan" placeholder="Tunjangan Jabatan" required>
+            <input type="text" name="tunj_makan" id="tunj_makan" placeholder="Tunjangan Makan" required>
+            <input type="text" name="tunj_transport" id="tunj_transport" placeholder="Tunjangan Transport" required>
+            <input type="text" name="premi_kehadiran" id="premi_kehadiran" placeholder="Premi Kehadiran" required>
+
+
+            <div class="btn-group">
+                <button type="submit">Simpan</button>
+                <button type="button" onclick="closeModal()">Batal</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>  
+function formatRupiah(angka) {
+    return angka.replace(/\D/g, '') // hapus selain angka
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+function handleInput(e) {
+    let value = e.target.value;
+    e.target.value = formatRupiah(value);
+}
+
+// Pasang ke semua field
+document.querySelectorAll('#gaji_pokok, #tunj_jabatan, #tunj_makan, #tunj_transport, #premi_kehadiran')
+.forEach(input => {
+    input.addEventListener('input', handleInput);
+});
+
+function openModal() {
+    document.getElementById('modal').style.display = 'flex';
+    document.getElementById('modal-title').innerText = 'Tambah Karyawan';
+
+    document.getElementById('emp_id').value = '';
+    document.getElementById('nama').value = '';
+    document.getElementById('jabatan').value = '';
+    document.getElementById('kode').value = '';
+    document.getElementById('gaji_pokok').value = '';
+    document.getElementById('tunj_jabatan').value = '';
+    document.getElementById('tunj_makan').value = '';
+    document.getElementById('tunj_transport').value = '';
+    document.getElementById('premi_kehadiran').value = '';
+}
+
+function closeModal() {
+    document.getElementById('modal').style.display = 'none';
+}
+
+function editEmployee(btn) {
+    openModal();
+
+    document.getElementById('modal-title').innerText = 'Edit Karyawan';
+
+    document.getElementById('emp_id').value = btn.dataset.id;
+    document.getElementById('nama').value = btn.dataset.nama;
+    document.getElementById('jabatan').value = btn.dataset.jabatan;
+    const selectKode = document.getElementById('kode');
+    const value = btn.dataset.kode.trim();
+
+    if ([...selectKode.options].some(opt => opt.value === value)) {
+        selectKode.value = value;
+    } else {
+        selectKode.value = ""; // fallback kalau tidak ditemukan
+    }
+    document.getElementById('gaji_pokok').value = btn.dataset.gaji_pokok.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    document.getElementById('tunj_jabatan').value = btn.dataset.tunj_jabatan.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    document.getElementById('tunj_makan').value = btn.dataset.tunj_makan.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    document.getElementById('tunj_transport').value = btn.dataset.tunj_transport.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    document.getElementById('premi_kehadiran').value = btn.dataset.premi_kehadiran.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+</script>
+
+{% endblock %}
+

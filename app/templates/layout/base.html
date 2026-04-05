@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HRIS System</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main_style.css') }}">
+</head>
+<body>
+
+<div class="app-container">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <h2 class="logo">HRIS</h2>
+
+        <ul class="menu">
+            <li><a href="/">🏠 Dashboard</a></li>
+            <li><a href="{{ url_for('employee.index') }}">👨‍💼 Karyawan</a></li>
+            <li><a href="#">💰 Payroll</a></li>
+            <li><a href="#">🕒 Absensi</a></li>
+        </ul>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="main">
+
+        <!-- NAVBAR -->
+        <div class="navbar">
+            <div class="nav-left">
+                <span>Dashboard</span>
+            </div>
+
+            <div class="nav-right">
+                <span>{{ session.username }}</span>
+                <a href="{{ url_for('auth.logout') }}" class="logout-btn">Logout</a>
+            </div>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="content">
+            {% block content %}{% endblock %}
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

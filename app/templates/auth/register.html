@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register HRIS</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth_style.css') }}">
+</head>
+<body>
+
+<div class="login-container">
+
+    <div class="login-card">
+        <h2>Register HRIS</h2>
+        <p class="subtitle">Buat akun untuk mengakses sistem</p>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="alert">
+                    {{ messages[0] }}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+
+            <div class="form-group">
+                <input type="text" name="username" placeholder="Username" required>
+            </div>
+
+            <div class="form-group">
+                <input type="password" name="password" placeholder="Password" required>
+            </div>
+
+            <div class="form-group">
+                <input type="password" name="confirm_password" placeholder="Konfirmasi Password" required>
+            </div>
+
+            <div class="form-group">
+                <select name="role" required>
+                    <option value="">-- Pilih Role --</option>
+                    <option value="admin">Admin</option>
+                    <option value="hr">HR</option>
+                </select>
+            </div>
+
+            <button type="submit">Register</button>
+        </form>
+
+        <p style="margin-top:15px;">
+            Sudah punya akun? 
+            <a href="{{ url_for('auth.login') }}">Login</a>
+        </p>
+
+    </div>
+
+</div>
+
+</body>
+</html>
