@@ -1,0 +1,167 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+
+<h2>Absensi</h2>
+
+<button class="btn-add" onclick="openModal()">+ Tambah Absensi</button>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nama</th>
+            <th>Tanggal</th>
+            <th>Check In</th>
+            <th>Check Out</th>
+            <th>Status</th>
+            <th>On-Time</th>
+            <th>Aksi</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in data %}
+        <tr>
+            <td>{{ row.nama }}</td>
+            <td>{{ row.tanggal }}</td>
+            <td>{{ row.check_in or '-' }}</td>
+            <td>{{ row.check_out or '-' }}</td>
+            <td>{{ row.stat_kehadiran }}</td>
+            <td>
+                {% if row.stat_on_time == 1 %}
+                    ✅ On Time
+                {% elif row.stat_on_time == 0 %}
+                    ❌ Telat
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td>{{ row.keterangan }}</td>
+            <td>
+                <button onclick="editAttendance(this)"
+                data-id="{{ row.id }}"
+                data-id_karyawan="{{ row.id_karyawan }}"
+                data-tanggal="{{ row.tanggal }}"
+                data-check_in="{% if row.check_in %}{{ '%02d:%02d' % (row.check_in.seconds // 3600, (row.check_in.seconds // 60) % 60) }}{% endif %}"
+                data-check_out="{% if row.check_out %}{{ '%02d:%02d' % (row.check_out.seconds // 3600, (row.check_out.seconds // 60) % 60) }}{% endif %}"
+                data-stat_kehadiran="{{ row.stat_kehadiran }}"
+                data-keterangan="{{ row.keterangan }}">
+                    Edit
+                </button>
+                <a href="/attendance/delete/{{ row.id }}" onclick="return confirm('Hapus data?')">Hapus</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <h3 id="modal-title">Input Absensi</h3>
+
+        <form method="POST" action="/attendance/save">
+
+            <input type="hidden" name="id" id="atd_id">
+
+            <!-- Karyawan -->
+            <select name="id_karyawan" id="id_karyawan" required>
+                <option value="">-- Pilih Karyawan --</option>
+                {% for emp in employees %}
+                <option value="{{ emp.id }}">{{ emp.nama }}</option>
+                {% endfor %}
+            </select>
+
+            <!-- Tanggal -->
+            <input type="date" name="tanggal" id="tanggal" placeholder="Tanggal" required>
+
+            <!-- Status -->
+            <select name="stat_kehadiran" id="stat_kehadiran" aria-placeholder="Jenis Kehadiran" required>
+                <option value="MASUK">MASUK</option>
+                <option value="OFF">OFF</option>
+                <option value="ALPA">ALPA</option>
+                <option value="PERDIN">PERDIN</option>
+            </select>
+
+            <!-- Jam -->
+            <input type="time" name="check_in" id="check_in" placeholder="Jam Masuk">
+            <input type="time" name="check_out" id="check_out" placeholder="Jam Pulang">
+
+            <!-- Keterangan -->
+            <input type="text" name="keterangan" id="keterangan" placeholder="Keterangan">
+
+            <div class="btn-group">
+                <button type="submit">Simpan</button>
+                <button type="button" onclick="closeModal()">Batal</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.getElementById('stat_kehadiran').addEventListener('change', function() {
+    const status = this.value;
+
+    const checkIn = document.getElementById('check_in');
+    const checkOut = document.getElementById('check_out');
+
+    if (status === 'MASUK') {
+        checkIn.disabled = false;
+        checkOut.disabled = false;
+    } else {
+        checkIn.value = '';
+        checkOut.value = '';
+        checkIn.disabled = true;
+        checkOut.disabled = true;
+    }
+});
+
+function openModal() {
+    document.getElementById('modal').style.display = 'flex';
+    document.getElementById('modal-title').innerText = 'Tambah Absensi';
+
+    document.getElementById('atd_id').value = '';
+    document.getElementById('id_karyawan').value = '';
+    document.getElementById('tanggal').value = '';
+    document.getElementById('check_in').value = '';
+    document.getElementById('check_out').value = '';
+    document.getElementById('keterangan').value = '';
+}
+
+function closeModal() {
+    document.getElementById('modal').style.display = 'none';
+}
+
+function editAttendance(btn) {
+    openModal();
+
+    document.getElementById('modal-title').innerText = 'Edit Absensi';
+
+    document.getElementById('atd_id').value = btn.dataset.id;
+    document.getElementById('id_karyawan').value = btn.dataset.id_karyawan;
+    
+    const selectKaryawan = document.getElementById('id_karyawan');
+    const valueKaryawan = btn.dataset.id_karyawan.trim();
+    if ([...selectKaryawan.options].some(opt => opt.value === valueKaryawan)) {
+        selectKaryawan.value = valueKaryawan;
+    } else {
+        selectKaryawan.value = ""; // fallback kalau tidak ditemukan
+    }
+    
+    document.getElementById('tanggal').value = btn.dataset.tanggal;
+    
+    const selectKehadiran = document.getElementById('stat_kehadiran');
+    const valueKehadiran = btn.dataset.stat_kehadiran.trim();
+
+    if ([...selectKehadiran.options].some(opt => opt.value === valueKehadiran)) {
+        selectKehadiran.value = valueKehadiran;
+    } else {
+        selectKehadiran.value = ""; // fallback kalau tidak ditemukan
+    }
+
+    document.getElementById('check_in').value = btn.dataset.check_in;
+    document.getElementById('check_out').value = btn.dataset.check_out;
+    document.getElementById('keterangan').value = btn.dataset.keterangan;
+}
+</script>
+
+{% endblock %}

@@ -133,14 +133,15 @@ function editEmployee(btn) {
     document.getElementById('emp_id').value = btn.dataset.id;
     document.getElementById('nama').value = btn.dataset.nama;
     document.getElementById('jabatan').value = btn.dataset.jabatan;
+    
     const selectKode = document.getElementById('kode');
     const value = btn.dataset.kode.trim();
-
     if ([...selectKode.options].some(opt => opt.value === value)) {
         selectKode.value = value;
     } else {
         selectKode.value = ""; // fallback kalau tidak ditemukan
     }
+
     document.getElementById('gaji_pokok').value = btn.dataset.gaji_pokok.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     document.getElementById('tunj_jabatan').value = btn.dataset.tunj_jabatan.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     document.getElementById('tunj_makan').value = btn.dataset.tunj_makan.replace(/\B(?=(\d{3})+(?!\d))/g, ".");

@@ -1,0 +1,162 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+
+<h2>Payroll</h2>
+
+<button class="btn-add" onclick="openModal()">+ Generate Payroll</button>
+
+<div class="table-container">
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nama</th>
+                <th>Periode</th>
+                <th>Upah Tetap</th>
+                <th>Tunjangan Makan</th>
+                <th>Tunjangan Transport</th>
+                <th>Total Premi Kehadiran</th>
+                <th>Potongan</th>
+                <th>Take Home Pay</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+            <tr>
+                <td>{{ row.nama }}</td>
+                <td>{{ row.periode }}</td>
+                <td>{{ row.upah_tetap }}</td>
+                <td>{{ row.tunj_makan }}</td>
+                <td>{{ row.tunj_transport }}</td>
+                <td>{{ row.tot_premi_kehadiran }}</td>
+                <td>{{ row.total_potongan }}</td>
+                <td><b>{{ row.gaji_bersih }}</b></td>
+                <td>
+                    <a href="/payroll/slip/{{ row.id }}">Slip</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- MODAL -->
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <h3>Generate Payroll</h3>
+
+        <form method="POST" action="/payroll/save" class="form-container">
+
+            <select name="id_karyawan" id="id_karyawan" required onchange="getKaryawan(this.value)">
+                <option value="">-- Pilih Karyawan --</option>
+                {% for emp in employees %}
+                <option value="{{ emp.id }}">{{ emp.nama }}</option>
+                {% endfor %}
+            </select>
+
+            <input type="month" name="periode" required>
+            <input type="number" name="hari_kerja" id="hari_kerja" placeholder="Jumlah Hari Kerja" required>
+
+            <input type="text" name="gaji_pokok" id="gaji_pokok" placeholder="Gaji Pokok" class="input-readonly" readonly>
+            <input type="text" name="tunj_jabatan" id="tunj_jabatan" placeholder="Tunjangan Jabatan" class="input-readonly" readonly>
+            <input type="text" name="tunj_makan" id="tunj_makan" placeholder="Tunjangan Makan" class="input-readonly" readonly>
+            <input type="text" name="tunj_transport" id="tunj_transport" placeholder="Tunjangan Transport" class="input-readonly" readonly>
+            <input type="text" name="premi_kehadiran" id="premi_kehadiran" placeholder="Premi Kehadiran" class="input-readonly" readonly>
+
+            <button type="button" onclick="hitung()">Hitung</button>
+
+            <hr>
+
+            <p>BPJS Kes: <span id="bpjs_kes">0</span></p>
+            <p>BPJS TK: <span id="bpjs_tk">0</span></p>
+            <p>PPh21: <span id="pph21">0</span></p>
+            <p><b>Take Home Pay: <span id="net">0</span></b></p>
+
+            <div class="btn-group">
+                <button type="submit">Simpan</button>
+                <button type="button" onclick="closeModal()">Batal</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+
+// membuka modal inputan
+function openModal() {
+    document.getElementById('modal').style.display = 'flex';
+}
+
+function formatRupiah(angka) {
+    return new Intl.NumberFormat('id-ID').format(angka);
+}
+
+function handleInput(e) {
+    let value = e.target.value;
+    e.target.value = formatRupiah(value);
+}
+
+// Pasang ke semua field
+document.querySelectorAll('#gaji_pokok, #tunj_jabatan, #tunj_makan, #tunj_transport, #premi_kehadiran')
+.forEach(input => {
+    input.addEventListener('input', handleInput);
+});
+
+// fungsi otomatis inputan nilai gaji karyawan
+function getKaryawan(id) {
+    if(!id) return;
+
+    fetch(`get-karyawan/${id}`)
+        .then(response => response.json())
+        .then(employee => {
+            document.getElementById('gaji_pokok').value = formatRupiah(String(employee.gaji_pokok) || 0);
+            document.getElementById('tunj_jabatan').value = formatRupiah(String(employee.tunj_jabatan) || 0);
+            document.getElementById('tunj_makan').value = formatRupiah(String(employee.tunj_makan) || 0);
+            document.getElementById('tunj_transport').value = formatRupiah(String(employee.tunj_transport) || 0);
+            document.getElementById('premi_kehadiran').value = formatRupiah(String(employee.premi_kehadiran) || 0);
+        })
+}
+
+function cleanNumber(val) {
+    return parseFloat(val.replace(/\./g, '').replace(',', '.')) || 0;
+}
+
+function hitung() {
+    let gaji = cleanNumber(document.getElementById('gaji_pokok').value) || 0;
+    let tunj_jabatan = cleanNumber(document.getElementById('tunj_jabatan').value) || 0;
+    let tunj_makan = cleanNumber(document.getElementById('tunj_makan').value) || 0;
+    let tunj_transport = cleanNumber(document.getElementById('tunj_transport').value) || 0;
+    let premi_kehadiran = cleanNumber(document.getElementById('premi_kehadiran').value) || 0;
+    let hari_kerja = cleanNumber(document.getElementById('hari_kerja').value) || 0;
+
+    let upah_tetap = gaji + tunj_jabatan;
+    let tot_premi_kehadiran = premi_kehadiran * hari_kerja;
+    let bruto = upah_tetap + tunj_jabatan + tunj_transport + tot_premi_kehadiran;
+
+    let bpjs_kes = upah_tetap * 0.01;
+    let bpjs_tk = upah_tetap * 0.03;
+
+    let biaya_jabatan = Math.min(0.05 * upah_tetap, 500000);
+    let neto = bruto - biaya_jabatan;
+    let neto_tahun = neto * 12;
+    let pkp = Math.max(0, neto_tahun - 54000000);
+    let pph21 = (0.05 * pkp) / 12;
+
+    let total = bpjs_kes + bpjs_tk + pph21;
+    let net = bruto - total;
+
+    document.getElementById('bpjs_kes').innerText = bpjs_kes.toFixed(0);
+    document.getElementById('bpjs_tk').innerText = bpjs_tk.toFixed(0);
+    document.getElementById('pph21').innerText = pph21.toFixed(0);
+    document.getElementById('net').innerText = net.toFixed(0);
+}
+
+function closeModal() {
+    document.getElementById('modal').style.display = 'none';
+}
+
+</script>
+
+{% endblock %}

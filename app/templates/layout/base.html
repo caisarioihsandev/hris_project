@@ -17,8 +17,8 @@
         <ul class="menu">
             <li><a href="/">🏠 Dashboard</a></li>
             <li><a href="{{ url_for('employee.index') }}">👨‍💼 Karyawan</a></li>
-            <li><a href="#">💰 Payroll</a></li>
-            <li><a href="#">🕒 Absensi</a></li>
+            <li><a href="{{ url_for('payroll.index') }}">💰 Payroll</a></li>
+            <li><a href="{{ url_for('attendance.index') }}">🕒 Absensi</a></li>
         </ul>
     </aside>
 

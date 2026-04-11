@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        h2 { text-align: center; }
+        table { width: 100%; border-collapse: collapse; }
+        td { padding: 8px; }
+        .border { border-top: 1px solid black; }
+    </style>
+</head>
+<body>
+
+<h2>SLIP GAJI</h2>
+
+<p>Nama: {{ data.nama }}</p>
+<p>Periode: {{ data.periode }}</p>
+
+<table>
+    <tr><td>Gaji Pokok</td><td>{{ data.gaji_pokok }}</td></tr>
+    <tr><td>Tunjangan Jabatan</td><td>{{ data.tunj_jabatan }}</td></tr>
+    <tr><td>Tunjangan Makan</td><td>{{ data.tunj_makan }}</td></tr>
+    <tr><td>Tunjangan Transport</td><td>{{ data.tunj_transport }}</td></tr>
+    <tr><td>Total Premi Kehadiran</td><td>{{ data.tot_premi_kehadiran }}</td></tr>
+
+    <tr class="border"><td colspan="2"><b>Potongan</b></td></tr>
+
+    <tr><td>Potongan Absensi</td><td>{{ data.pot_absen }}</td></tr>
+    <tr><td>BPJS Kesehatan</td><td>{{ data.pot_bpjs_kes }}</td></tr>
+    <tr><td>BPJS TK</td><td>{{ data.pot_bpjs_tk }}</td></tr>
+    <tr><td>PPh21</td><td>{{ data.pph21 }}</td></tr>
+
+    <tr class="border">
+        <td><b>Take Home Pay</b></td>
+        <td><b>{{ data.gaji_bersih }}</b></td>
+    </tr>
+</table>
+
+</body>
+</html>
