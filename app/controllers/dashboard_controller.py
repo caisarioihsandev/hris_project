@@ -1,5 +1,6 @@
-from flask import Blueprint, render_template, request, redirect
+from flask import Blueprint, render_template
 from app.controllers.auth_controller import login_required
+from app.utils.decorators import role_required
 
 bp = Blueprint('/', __name__, url_prefix='/')
 

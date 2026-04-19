@@ -21,22 +21,20 @@ def get_karyawan(id):
 def save():
     data = request.form.to_dict()
 
+    data['gaji_pokok'] = request.form['gaji_pokok'].replace('.', '')
+    data['tunj_jabatan'] = request.form['tunj_jabatan'].replace('.', '')
+    data['tunj_makan'] = request.form['tunj_makan'].replace('.', '')
+    data['tunj_transport'] = request.form['tunj_transport'].replace('.', '')
+    data['premi_kehadiran'] = request.form['premi_kehadiran'].replace('.', '')
+
     if data.get('id'):  # UPDATE
         Payroll.update(data)
     else:  # INSERT
         Payroll.create(data)
 
-    Payroll.create(data)
     return redirect(url_for('payroll.index'))
 
-
-@bp.route('/update', methods=['POST'])
-def update():
-    data = request.form.to_dict()
-    Payroll.update(data)
-    return redirect(url_for('payroll.index'))
-
-@bp.route('/delete/<int:id>', methods=['POST'])
+@bp.route('/delete/<int:id>')
 def delete(id):
     Payroll.delete(id)
     return redirect(url_for('payroll.index'))

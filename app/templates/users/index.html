@@ -1,0 +1,102 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+<div class="container">
+
+    <h2>Manajemen User</h2>
+
+    <button class="btn-add" onclick="openModal()">+ Tambah User</button>
+
+    <div class="table-container">
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.role }}</td>
+                    <td>
+                        <button onclick="editUser(this)"
+                            data-id="{{ user.id }}"
+                            data-username="{{ user.username }}"
+                            data-role="{{ user.role }}">
+                            Edit
+                        </button>
+    
+                        <a href="/users/delete/{{ user.id }}" onclick="return confirm('Hapus user?')">
+                            Delete
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+</div>
+
+
+<!-- MODAL -->
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <h3 id="modal-title">Tambah User</h3>
+
+        <form method="POST" action="/users/save">
+            <input type="hidden" name="id" id="user_id">
+
+            <input type="text" name="username" id="username" placeholder="Username" required>
+
+            <input type="password" name="password" id="password" placeholder="Password">
+            <input type="password" name="confirm" id="confirm" placeholder="Konfirmasi Password">
+
+            <select name="role" id="role">
+                <option value="admin">Admin</option>
+                <option value="hr">HRD</option>
+            </select>
+            <div class="btn-group">
+                <button type="submit">Simpan</button>
+                <button onclick="closeModal()">Tutup</button>
+            </div>
+        </form>
+
+        
+    </div>
+</div>
+
+
+<script>
+function openModal() {
+    document.getElementById('modal').style.display = 'block';
+    document.getElementById('modal-title').innerText = 'Tambah User';
+
+    document.getElementById('user_id').value = '';
+    document.getElementById('username').value = '';
+    document.getElementById('password').value = '';
+
+    document.getElementById('role').value = 'hr';
+}
+
+function closeModal() {
+    document.getElementById('modal').style.display = 'none';
+}
+
+function editUser(btn) {
+    openModal();
+
+    document.getElementById('modal-title').innerText = 'Edit User';
+
+    document.getElementById('user_id').value = btn.dataset.id;
+    document.getElementById('username').value = btn.dataset.username;
+    document.getElementById('role').value = btn.dataset.role;
+}
+</script>
+
+{% endblock %}

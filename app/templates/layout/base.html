@@ -15,10 +15,28 @@
         <h2 class="logo">HRIS</h2>
 
         <ul class="menu">
-            <li><a href="/">🏠 Dashboard</a></li>
-            <li><a href="{{ url_for('employee.index') }}">👨‍💼 Karyawan</a></li>
-            <li><a href="{{ url_for('payroll.index') }}">💰 Payroll</a></li>
-            <li><a href="{{ url_for('attendance.index') }}">🕒 Absensi</a></li>
+            <li><a href="/">
+                <span class="icon">🏠</span>
+                <span class="text"> Dashboard</span>
+            </a></li>
+            <li><a href="{{ url_for('employee.index') }}">
+                <span class="icon">👨‍💼</span>
+                <span class="text">Karyawan</span>
+            </a></li>
+            <li><a href="{{ url_for('payroll.index') }}">
+                <span class="icon">💰</span>
+                <span class="text"> Payroll</span>
+            </a></li>
+            <li><a href="{{ url_for('attendance.index') }}">
+                <span class="icon">🕒</span>
+                <span class="text"> Absensi</span>
+            </a></li>
+            {% if session['role'] == 'admin' %}
+            <li><a href="/users">
+                <span class="icon">🧩</span>
+                <span class="text"> Manajemen User</span>
+            </a></li>
+            {% endif %}
         </ul>
     </aside>
 
@@ -28,6 +46,7 @@
         <!-- NAVBAR -->
         <div class="navbar">
             <div class="nav-left">
+                <button id="toggleSidebar" class="hamburger">☰</button>
                 <span>Dashboard</span>
             </div>
 
@@ -45,6 +64,17 @@
     </div>
 
 </div>
+
+<script>
+
+const toggleBtn = document.getElementById('toggleSidebar');
+const sidebar = document.querySelector('.sidebar');
+
+toggleBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('collapsed');
+});
+
+</script>
 
 </body>
 </html>

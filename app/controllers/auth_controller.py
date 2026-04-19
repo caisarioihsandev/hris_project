@@ -4,26 +4,22 @@ from app.models.user import User
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
-
 # REGISTER
 @bp.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        confirm = request.form['confirm_password']
-        role = request.form['role']
+        data = request.form.to_dict()
 
-        if password != confirm:
+        if data['password'] != data['confirm']:
             flash('Password tidak sama!')
             return redirect('/auth/register')
 
-        if User.find_by_username(username):
+        if User.find_by_username(data['username']):
             flash('Username sudah digunakan!')
             return redirect('/auth/register')
 
-        hashed = generate_password_hash(password)
-        User.create(username, hashed, role)
+        data['password'] = generate_password_hash(data['password'])
+        User.create(data)
 
         flash('Registrasi berhasil!')
         return redirect('/auth/login')
@@ -35,12 +31,11 @@ def register():
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
+        data = request.form.to_dict()
 
-        user = User.find_by_username(username)
+        user = User.find_by_username(data['username'])
 
-        if user and check_password_hash(user['password'], password):
+        if user and check_password_hash(user['password'], data['password']):
             session['user_id'] = user['id']
             session['username'] = user['username']
             session['role'] = user['role']

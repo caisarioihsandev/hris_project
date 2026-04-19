@@ -1,17 +1,21 @@
-from flask import Blueprint, render_template, request, redirect
+from flask import Blueprint, render_template, request, redirect,session
 from app.models.employee import Employee
 from app.controllers.auth_controller import login_required
+from app.utils.decorators import role_required
 
 bp = Blueprint('employee', __name__, url_prefix='/employees')
 
 @bp.route('/')
 @login_required
+@role_required(['admin', 'hr'])
 def index():
+    print(session.get('role'))
     employees = Employee.get_all()
     return render_template('employees/index.html', employees=employees)
 
 @bp.route('/create', methods=['POST'])
 @login_required
+@role_required(['admin', 'hr'])
 def create():
     data = request.form
     Employee.create(data)
@@ -19,6 +23,7 @@ def create():
 
 @bp.route('/save', methods=['POST'])
 @login_required
+@role_required(['admin', 'hr'])
 def save():
     data = request.form.to_dict()
 
@@ -38,6 +43,7 @@ def save():
 
 @bp.route('/delete/<int:id>')
 @login_required
+@role_required(['admin', 'hr'])
 def delete(id):
     Employee.delete(id)
     return redirect('/employees')

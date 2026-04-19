@@ -3,13 +3,13 @@ from app.models.attendance import Attendance
 from app.models.employee import Employee
 from app.controllers.auth_controller import login_required
 
-bp = Blueprint('attendance', __name__, url_prefix='/attendance')
+bp = Blueprint('attendance', __name__, url_prefix='/attendances')
 
 @bp.route('/')
 def index():
     data = Attendance.get_all()
     employees = Employee.get_all()
-    return render_template('attendance/index.html', data=data, employees=employees)
+    return render_template('attendances/index.html', data=data, employees=employees)
 
 
 @bp.route('/save', methods=['POST'])
@@ -25,10 +25,10 @@ def save():
     else:  # INSERT
         Attendance.create(data)
 
-    return redirect('/attendance')
+    return redirect('/attendances')
 
 @bp.route('/delete/<int:id>')
 @login_required
 def delete(id):
     Attendance.delete(id)
-    return redirect('/attendance')
+    return redirect('/attendances')

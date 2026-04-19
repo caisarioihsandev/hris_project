@@ -5,6 +5,10 @@
     font-family: 'Segoe UI', sans-serif;
 }
 
+html, body {
+    height: 100%;
+}
+
 body {
     height: 100vh;
     background: linear-gradient(135deg, #4facfe, #00f2fe);
@@ -14,15 +18,20 @@ body {
 
 .app-container {
     display: flex;
-    height: 100vh;
+    min-height: 100vh; /* 🔥 penting */
 }
 
 /* SIDEBAR */
 .sidebar {
     width: 220px;
+    min-width: 220px;
+    max-width: 220px;
+    flex-shrink: 0; /* 🔥 penting */
     background: #1e293b;
     color: white;
     padding: 20px;
+    transition: all 0.3s ease;
+
 }
 
 .logo {
@@ -47,11 +56,59 @@ body {
     color: #38bdf8;
 }
 
+/* Humburger */
+.hamburger {
+    font-size: 20px;
+    margin-right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.sidebar.collapsed {
+    width: 70px;
+    min-width: 70px;
+    max-width: 70px;
+}
+
+/* Menu Icon */
+.menu a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.icon {
+    font-size: 18px;
+    width: 25px;
+    text-align: center;
+}
+
+/* sembunyikan teks saat collapse */
+.sidebar.collapsed .text {
+    display: none;
+}
+
+.sidebar.collapsed .menu a {
+    justify-content: center;
+}
+
+.sidebar.collapsed .menu a::before {
+    font-size: 18px;
+}
+
+/* logo kecil */
+.sidebar.collapsed .logo {
+    font-size: 16px;
+}
+
+
 /* MAIN */
 .main {
     flex: 1;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 /* NAVBAR */
@@ -72,6 +129,7 @@ body {
 
 /* CONTENT */
 .content {
+    overflow: hidden;
     padding: 20px;
     background: #f1f5f9;
     flex: 1;
@@ -92,20 +150,29 @@ body {
 
 /* employees */
 /* TABLE */
-.table {
+.table-container {
     width: 100%;
-    border-collapse: collapse;
-    background: white;
+    overflow-x: auto;
+    display: block;
 }
 
-.table-container {
-    overflow-x: auto;
+.table {
+    min-width: 1000px;
+    width: 100%;
+    border-collapse: collapse;
 }
 
 .table th, .table td {
     padding: 12px;
     border-bottom: 1px solid #ddd;
     text-align: center;
+}
+
+.table thead th {
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 2;
 }
 
 /* BUTTON */
@@ -255,6 +322,73 @@ body {
     background: #d1d5db;
 }
 
+/* ===== SLIP GAJI ===== */
+.slip-container {
+    margin-top: 20px;
+    border-top: 2px solid #ddd;
+    padding-top: 15px;
+}
+
+.slip-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.slip-box {
+    background: #f8fafc;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+}
+
+.slip-box h4 {
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #1e293b;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 5px;
+}
+
+.slip-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    margin-bottom: 6px;
+}
+
+.slip-total {
+    margin-top: 15px;
+    padding: 12px;
+    background: #22c55e;
+    color: white;
+    font-weight: bold;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Pagination */
+.pagination {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.pagination button {
+    padding: 8px 12px;
+    border: none;
+    background: #3b82f6;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.pagination button:hover {
+    background: #2563eb;
+}
+
 @media (max-width: 768px) {
     .sidebar {
         width: 70px;
@@ -284,5 +418,9 @@ body {
 
     content {
         padding: 10px;
+    }
+
+    .slip-grid {
+        grid-template-columns: 1fr;
     }
 }

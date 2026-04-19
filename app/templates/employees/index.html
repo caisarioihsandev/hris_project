@@ -6,50 +6,53 @@
 
 <button class="btn-add" onclick="openModal()">+ Tambah Karyawan</button>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Nama</th>
-            <th>Jabatan</th>
-            <th>Kode</th>
-            <th>Gaji</th>
-            <th>Tunjangan Jabatan</th>
-            <th>Tunjangan Makan</th>
-            <th>Tunjangan Transport</th>
-            <th>Premi Kehadiran</th>
-            <th>Aksi</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for emp in employees %}
-        <tr>
-            <td>{{ emp.nama }}</td>
-            <td>{{ emp.jabatan }}</td>
-            <td>{{ emp.kode }}</td>
-            <td>{{ emp.gaji_pokok|rupiah }}</td>
-            <td>{{ emp.tunj_jabatan|rupiah }}</td>
-            <td>{{ emp.tunj_makan|rupiah }}</td>
-            <td>{{ emp.tunj_transport|rupiah }}</td>
-            <td>{{ emp.premi_kehadiran|rupiah }}/hari</td>
-            <td>
-                <button onclick="editEmployee(this)"
-                data-id="{{ emp.id }}"
-                data-nama="{{ emp.nama }}"
-                data-jabatan="{{ emp.jabatan }}"
-                data-kode="{{ emp.kode }}"
-                data-gaji_pokok="{{ emp.gaji_pokok|int }}"
-                data-tunj_jabatan="{{ emp.tunj_jabatan|int }}"
-                data-tunj_makan="{{ emp.tunj_makan|int }}"
-                data-tunj_transport="{{ emp.tunj_transport|int }}"
-                data-premi_kehadiran="{{ emp.premi_kehadiran|int }}">
-                    Edit
-                </button>
-                <a href="/employees/delete/{{ emp.id }}" onclick="return confirm('Hapus data?')">Hapus</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="table-container">
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nama</th>
+                <th>Jabatan</th>
+                <th>Kode</th>
+                <th>Gaji</th>
+                <th>Tunjangan Jabatan</th>
+                <th>Tunjangan Makan</th>
+                <th>Tunjangan Transport</th>
+                <th>Premi Kehadiran</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for emp in employees %}
+            <tr>
+                <td>{{ emp.nama }}</td>
+                <td>{{ emp.jabatan }}</td>
+                <td>{{ emp.kode }}</td>
+                <td>{{ emp.gaji_pokok|rupiah }}</td>
+                <td>{{ emp.tunj_jabatan|rupiah }}</td>
+                <td>{{ emp.tunj_makan|rupiah }}</td>
+                <td>{{ emp.tunj_transport|rupiah }}</td>
+                <td>{{ emp.premi_kehadiran|rupiah }}/hari</td>
+                <td>
+                    <button onclick="editEmployee(this)"
+                    data-id="{{ emp.id }}"
+                    data-nama="{{ emp.nama }}"
+                    data-jabatan="{{ emp.jabatan }}"
+                    data-kode="{{ emp.kode }}"
+                    data-gaji_pokok="{{ emp.gaji_pokok|int }}"
+                    data-tunj_jabatan="{{ emp.tunj_jabatan|int }}"
+                    data-tunj_makan="{{ emp.tunj_makan|int }}"
+                    data-tunj_transport="{{ emp.tunj_transport|int }}"
+                    data-premi_kehadiran="{{ emp.premi_kehadiran|int }}">
+                        Edit
+                    </button>
+                    <a href="/employees/delete/{{ emp.id }}" onclick="return confirm('Hapus data?')">Hapus</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
 <!-- MODAL -->
 <div id="modal" class="modal">

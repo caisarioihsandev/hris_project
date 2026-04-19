@@ -13,11 +13,16 @@
             <tr>
                 <th>Nama</th>
                 <th>Periode</th>
+                <th>Gaji Pokok</th>
+                <th>Tunjangan Jabatan</th>
                 <th>Upah Tetap</th>
                 <th>Tunjangan Makan</th>
                 <th>Tunjangan Transport</th>
                 <th>Total Premi Kehadiran</th>
-                <th>Potongan</th>
+                <th>Potongan Absensi</th>
+                <th>Potongan BPJS Kesehatan</th>
+                <th>Potongan BPJS Ketenagakerjaan</th>
+                <th>Total Potongan</th>
                 <th>Take Home Pay</th>
                 <th>Aksi</th>
             </tr>
@@ -27,27 +32,65 @@
             <tr>
                 <td>{{ row.nama }}</td>
                 <td>{{ row.periode }}</td>
-                <td>{{ row.upah_tetap }}</td>
-                <td>{{ row.tunj_makan }}</td>
-                <td>{{ row.tunj_transport }}</td>
-                <td>{{ row.tot_premi_kehadiran }}</td>
-                <td>{{ row.total_potongan }}</td>
-                <td><b>{{ row.gaji_bersih }}</b></td>
+                <td>{{ "{:,}".format(row.gaji_pokok|int).replace(",", ".") }}</td>
+                <td>{{ "{:,}".format(row.tunj_jabatan|int).replace(",", ".") }}</td>
+                <td>{{ "{:,}".format(row.upah_tetap|int).replace(",", ".") }}</td>
+                <td>{{ "{:,}".format(row.tunj_makan|int).replace(",", ".") }}</td>
+                <td>{{ "{:,}".format(row.tunj_transport|int).replace(",", ".") }}</td>
+                <td>{{ "{:,}".format(row.tot_premi_kehadiran|int).replace(",", ".") }}</td>
+                <td>{{ "{:,}".format(row.pot_absen|int).replace(",", ".") }}</td>
+                <td>{{ "{:,}".format(row.pot_bpjs_kes|int).replace(",", ".") }}</td>
+                <td>{{ "{:,}".format(row.pot_bpjs_tk|int).replace(",", ".") }}</td>
+                <td>{{ "{:,}".format(row.total_potongan|int).replace(",", ".") }}</td>
+                <td><b>{{ "{:,}".format(row.gaji_bersih|int).replace(",", ".") }}</b></td>
                 <td>
                     <a href="/payroll/slip/{{ row.id }}">Slip</a>
+                    <button onclick="editPayroll(this)"
+                    data-id="{{ row.id }}"
+                    data-id_karyawan="{{ row.id_karyawan }}"
+                    data-periode="{{ row.periode }}"
+                    data-tot_hari_kerja="{{ row.tot_hari_kerja }}"
+                    data-gaji_pokok="{{ row.gaji_pokok|int }}"
+                    data-tunj_jabatan="{{ row.tunj_jabatan|int }}"
+                    data-upah_tetap="{{ row.upah_tetap|int }}"
+                    data-tunj_makan="{{ row.tunj_makan|int }}"
+                    data-tunj_transport="{{ row.tunj_transport|int }}"
+                    data-premi_kehadiran="{{ row.premi_kehadiran|int }}"
+                    data-bpjs_kes_tg_perusahaan="{{ row.bpjs_kes_tg_perusahaan|int }}"
+                    data-bpjs_tk_tg_perusahaan="{{ row.bpjs_tk_tg_perusahaan|int }}"
+                    data-upah_penuh="{{ row.upah_penuh|int }}"
+                    data-pot_alpha="{{ row.pot_alpha }}"
+                    data-pot_telat="{{ row.pot_telat}}"
+                    data-pot_absen="{{ row.pot_absen}}"
+                    data-pot_bpjs_kes="{{ row.pot_bpjs_kes }}"
+                    data-pot_bpjs_tk="{{ row.pot_bpjs_tk}}"
+                    data-pot_pph21="{{ row.pot_pph21}}"
+                    data-total_potongan="{{ row.total_potongan }}"
+                    data-gaji_bersih="{{ row.gaji_bersih }}"
+                    data-keterangan="{{ row.keterangan }}">
+                        Edit
+                    </button>
+                    <a href="/payroll/delete/{{ row.id }}" onclick="return confirm('Hapus data?')">Hapus</a>
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+
+    <div class="pagination">
+        <button onclick="prevPage()">Prev</button>
+        <span id="page-info"></span>
+        <button onclick="nextPage()">Next</button>
+    </div>
 </div>
 
 <!-- MODAL -->
 <div id="modal" class="modal">
     <div class="modal-content">
-        <h3>Generate Payroll</h3>
+        <h3 id="modal-title">Generate Payroll</h3>
 
         <form method="POST" action="/payroll/save" class="form-container">
+            <input type="hidden" name="id" id="payroll_id">
 
             <select name="id_karyawan" id="id_karyawan" required onchange="getKaryawan(this.value)">
                 <option value="">-- Pilih Karyawan --</option>
@@ -56,23 +99,97 @@
                 {% endfor %}
             </select>
 
-            <input type="month" name="periode" required>
-            <input type="number" name="hari_kerja" id="hari_kerja" placeholder="Jumlah Hari Kerja" required>
+            <input type="month" name="periode" id="periode" required>
+            <input type="number" name="tot_hari_kerja" id="tot_hari_kerja" placeholder="Jumlah Hari Kerja" required>
 
             <input type="text" name="gaji_pokok" id="gaji_pokok" placeholder="Gaji Pokok" class="input-readonly" readonly>
             <input type="text" name="tunj_jabatan" id="tunj_jabatan" placeholder="Tunjangan Jabatan" class="input-readonly" readonly>
             <input type="text" name="tunj_makan" id="tunj_makan" placeholder="Tunjangan Makan" class="input-readonly" readonly>
             <input type="text" name="tunj_transport" id="tunj_transport" placeholder="Tunjangan Transport" class="input-readonly" readonly>
             <input type="text" name="premi_kehadiran" id="premi_kehadiran" placeholder="Premi Kehadiran" class="input-readonly" readonly>
+            <input type="text" name="keterangan" id="keterangan" placeholder="Keterangan">
 
             <button type="button" onclick="hitung()">Hitung</button>
+            
+            <div class="slip-container">
 
-            <hr>
+                <div class="slip-grid">
 
-            <p>BPJS Kes: <span id="bpjs_kes">0</span></p>
-            <p>BPJS TK: <span id="bpjs_tk">0</span></p>
-            <p>PPh21: <span id="pph21">0</span></p>
-            <p><b>Take Home Pay: <span id="net">0</span></b></p>
+                    <!-- PENDAPATAN -->
+                    <div class="slip-box">
+                        <h4>PENDAPATAN</h4>
+
+                        <div class="slip-row">
+                            <span>Gaji Pokok</span>
+                            <span id="gaji_display">0</span>
+                        </div>
+
+                        <div class="slip-row">
+                            <span>Tunjangan Jabatan</span>
+                            <span id="jabatan_display">0</span>
+                        </div>
+
+                        <div class="slip-row">
+                            <span>Tunjangan Makan</span>
+                            <span id="makan_display">0</span>
+                        </div>
+
+                        <div class="slip-row">
+                            <span>Tunjangan Transport</span>
+                            <span id="transport_display">0</span>
+                        </div>
+
+                        <div class="slip-row">
+                            <span>Premi Kehadiran</span>
+                            <span id="premi_display">0</span>
+                        </div>
+                    </div>
+
+                    <!-- POTONGAN -->
+                    <div class="slip-box">
+                        <h4>POTONGAN</h4>
+
+                        <div class="slip-row">
+                            <span>BPJS Kesehatan</span>
+                            <span id="bpjs_kes">0</span>
+                        </div>
+
+                        <div class="slip-row">
+                            <span>BPJS TK</span>
+                            <span id="bpjs_tk">0</span>
+                        </div>
+
+                        <div class="slip-row">
+                            <span>PPh21</span>
+                            <span id="pph21">0</span>
+                        </div>
+                    </div>
+
+                    <!-- TOTAL PENDAPATAN -->
+                    <div class="slip-box">
+                        <div class="slip-row">
+                            <span><b>Total Gaji Full</b></span>
+                            <span id="bruto_display">0</span>
+                        </div>
+                    </div>
+
+                    <!-- TOTAL POTONGAN -->
+                    <div class="slip-box">
+                        <div class="slip-row">
+                            <span><b>Total Potongan</b></span>
+                            <span id="potongan_display">0</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- TOTAL -->
+                <div class="slip-total">
+                    <span>Take Home Pay</span>
+                    <span id="net">0</span>
+                </div>
+
+            </div>
 
             <div class="btn-group">
                 <button type="submit">Simpan</button>
@@ -129,11 +246,11 @@ function hitung() {
     let tunj_makan = cleanNumber(document.getElementById('tunj_makan').value) || 0;
     let tunj_transport = cleanNumber(document.getElementById('tunj_transport').value) || 0;
     let premi_kehadiran = cleanNumber(document.getElementById('premi_kehadiran').value) || 0;
-    let hari_kerja = cleanNumber(document.getElementById('hari_kerja').value) || 0;
+    let hari_kerja = cleanNumber(document.getElementById('tot_hari_kerja').value) || 0;
 
     let upah_tetap = gaji + tunj_jabatan;
     let tot_premi_kehadiran = premi_kehadiran * hari_kerja;
-    let bruto = upah_tetap + tunj_jabatan + tunj_transport + tot_premi_kehadiran;
+    let bruto = upah_tetap + tunj_makan + tunj_transport + tot_premi_kehadiran;
 
     let bpjs_kes = upah_tetap * 0.01;
     let bpjs_tk = upah_tetap * 0.03;
@@ -147,15 +264,90 @@ function hitung() {
     let total = bpjs_kes + bpjs_tk + pph21;
     let net = bruto - total;
 
-    document.getElementById('bpjs_kes').innerText = bpjs_kes.toFixed(0);
-    document.getElementById('bpjs_tk').innerText = bpjs_tk.toFixed(0);
-    document.getElementById('pph21').innerText = pph21.toFixed(0);
-    document.getElementById('net').innerText = net.toFixed(0);
+    document.getElementById('gaji_display').innerText = formatRupiah(gaji);
+    document.getElementById('jabatan_display').innerText = formatRupiah(tunj_jabatan);
+    document.getElementById('makan_display').innerText = formatRupiah(tunj_makan);
+    document.getElementById('transport_display').innerText = formatRupiah(tunj_transport);
+    document.getElementById('premi_display').innerText = formatRupiah(tot_premi_kehadiran);
+
+    document.getElementById('bruto_display').innerText = formatRupiah(bruto);
+    document.getElementById('potongan_display').innerText = formatRupiah(total);
+
+
+    document.getElementById('bpjs_kes').innerText = formatRupiah(bpjs_kes);
+    document.getElementById('bpjs_tk').innerText = formatRupiah(bpjs_tk);
+    document.getElementById('pph21').innerText = formatRupiah(pph21);
+    document.getElementById('net').innerText = formatRupiah(net);
+
 }
 
 function closeModal() {
     document.getElementById('modal').style.display = 'none';
 }
+
+function editPayroll(btn) {
+    openModal();
+
+    document.getElementById('modal-title').innerText = 'Edit Payroll';
+
+    document.getElementById('payroll_id').value = btn.dataset.id;
+    
+    const selectKode = document.getElementById('id_karyawan');
+    const value = btn.dataset.id_karyawan.trim();
+    if ([...selectKode.options].some(opt => opt.value === value)) {
+        selectKode.value = String(value);
+    } else {
+        selectKode.value = ""; // fallback kalau tidak ditemukan
+    }
+
+    document.getElementById('periode').value = btn.dataset.periode;
+    document.getElementById('tot_hari_kerja').value = btn.dataset.tot_hari_kerja;
+
+    document.getElementById('gaji_pokok').value = formatRupiah(btn.dataset.gaji_pokok || 0);
+    document.getElementById('tunj_jabatan').value = formatRupiah(btn.dataset.tunj_jabatan || 0);
+    document.getElementById('tunj_makan').value = formatRupiah(btn.dataset.tunj_makan || 0);
+    document.getElementById('tunj_transport').value = formatRupiah(btn.dataset.tunj_transport || 0);
+    document.getElementById('premi_kehadiran').value = formatRupiah(btn.dataset.premi_kehadiran || 0);
+    document.getElementById('keterangan').value = btn.dataset.keterangan;
+}
+
+// pagination
+let currentPage = 1;
+const rowsPerPage = 5;
+
+function showPage(page) {
+    const rows = document.querySelectorAll(".table tbody tr");
+    const totalPages = Math.ceil(rows.length / rowsPerPage);
+
+    if (page < 1) page = 1;
+    if (page > totalPages) page = totalPages;
+
+    currentPage = page;
+
+    rows.forEach((row, index) => {
+        row.style.display =
+            index >= (page - 1) * rowsPerPage &&
+            index < page * rowsPerPage
+                ? ""
+                : "none";
+    });
+
+    document.getElementById("page-info").innerText =
+        `Page ${page} of ${totalPages}`;
+}
+
+function nextPage() {
+    showPage(currentPage + 1);
+}
+
+function prevPage() {
+    showPage(currentPage - 1);
+}
+
+// load pertama
+document.addEventListener("DOMContentLoaded", () => {
+    showPage(1);
+});
 
 </script>
 
