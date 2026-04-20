@@ -3,4 +3,3 @@ gunicorn
 mysql-connector-python
 pymysql
 python-dotenv
-WeasyPrint

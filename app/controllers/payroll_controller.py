@@ -1,7 +1,7 @@
 from flask import Blueprint, make_response, render_template, request, redirect, url_for, jsonify
 from app.models.payroll import Payroll
 from app.models.employee import Employee
-from weasyprint import HTML
+# from weasyprint import HTML
 
 
 bp = Blueprint('payroll', __name__, url_prefix='/payroll')
@@ -44,11 +44,12 @@ def slip(id):
     data = Payroll.get_one(id)
 
     html = render_template('payroll/slip.html', data=data)
+    response = html
 
-    pdf = HTML(string=html).write_pdf()
+    # pdf = HTML(string=html).write_pdf()
 
-    response = make_response(pdf)
-    response.headers['Content-Type'] = 'application/pdf'
-    response.headers['Content-Disposition'] = 'inline; filename=slip_gaji.pdf'
+    # response = make_response(pdf)
+    # response.headers['Content-Type'] = 'application/pdf'
+    # response.headers['Content-Disposition'] = 'inline; filename=slip_gaji.pdf'
 
     return response
