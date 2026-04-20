@@ -1,57 +1,65 @@
 {% extends 'layout/base.html' %}
 
 {% block content %}
+<div class="container">
 
-<h2>Data Karyawan</h2>
-
-<button class="btn-add" onclick="openModal()">+ Tambah Karyawan</button>
-
-<div class="table-container">
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Nama</th>
-                <th>Jabatan</th>
-                <th>Kode</th>
-                <th>Gaji</th>
-                <th>Tunjangan Jabatan</th>
-                <th>Tunjangan Makan</th>
-                <th>Tunjangan Transport</th>
-                <th>Premi Kehadiran</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for emp in employees %}
-            <tr>
-                <td>{{ emp.nama }}</td>
-                <td>{{ emp.jabatan }}</td>
-                <td>{{ emp.kode }}</td>
-                <td>{{ emp.gaji_pokok|rupiah }}</td>
-                <td>{{ emp.tunj_jabatan|rupiah }}</td>
-                <td>{{ emp.tunj_makan|rupiah }}</td>
-                <td>{{ emp.tunj_transport|rupiah }}</td>
-                <td>{{ emp.premi_kehadiran|rupiah }}/hari</td>
-                <td>
-                    <button onclick="editEmployee(this)"
-                    data-id="{{ emp.id }}"
-                    data-nama="{{ emp.nama }}"
-                    data-jabatan="{{ emp.jabatan }}"
-                    data-kode="{{ emp.kode }}"
-                    data-gaji_pokok="{{ emp.gaji_pokok|int }}"
-                    data-tunj_jabatan="{{ emp.tunj_jabatan|int }}"
-                    data-tunj_makan="{{ emp.tunj_makan|int }}"
-                    data-tunj_transport="{{ emp.tunj_transport|int }}"
-                    data-premi_kehadiran="{{ emp.premi_kehadiran|int }}">
-                        Edit
-                    </button>
-                    <a href="/employees/delete/{{ emp.id }}" onclick="return confirm('Hapus data?')">Hapus</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <h2>Data Karyawan</h2>
+    
+    <button class="btn-add" onclick="openModal()">+ Tambah Karyawan</button>
+    
+    <div class="table-container">
+    
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nama</th>
+                    <th>Jabatan</th>
+                    <th>Kode</th>
+                    <th>Gaji</th>
+                    <th>Tunjangan Jabatan</th>
+                    <th>Tunjangan Makan</th>
+                    <th>Tunjangan Transport</th>
+                    <th>Premi Kehadiran</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for emp in employees %}
+                <tr>
+                    <td>{{ emp.nama }}</td>
+                    <td>{{ emp.jabatan }}</td>
+                    <td>{{ emp.kode }}</td>
+                    <td>{{ emp.gaji_pokok|rupiah }}</td>
+                    <td>{{ emp.tunj_jabatan|rupiah }}</td>
+                    <td>{{ emp.tunj_makan|rupiah }}</td>
+                    <td>{{ emp.tunj_transport|rupiah }}</td>
+                    <td>{{ emp.premi_kehadiran|rupiah }}/hari</td>
+                    <td>
+                        <button onclick="editEmployee(this)"
+                        data-id="{{ emp.id }}"
+                        data-nama="{{ emp.nama }}"
+                        data-jabatan="{{ emp.jabatan }}"
+                        data-kode="{{ emp.kode }}"
+                        data-gaji_pokok="{{ emp.gaji_pokok|int }}"
+                        data-tunj_jabatan="{{ emp.tunj_jabatan|int }}"
+                        data-tunj_makan="{{ emp.tunj_makan|int }}"
+                        data-tunj_transport="{{ emp.tunj_transport|int }}"
+                        data-premi_kehadiran="{{ emp.premi_kehadiran|int }}">
+                            Edit
+                        </button>
+                        <a href="/employees/delete/{{ emp.id }}" onclick="return confirm('Hapus data?')">Hapus</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    
+        <div class="pagination">
+            <button onclick="prevPage()">Prev</button>
+            <span id="page-info"></span>
+            <button onclick="nextPage()">Next</button>
+        </div>
+    </div>
 </div>
 
 <!-- MODAL -->
@@ -151,6 +159,54 @@ function editEmployee(btn) {
     document.getElementById('tunj_transport').value = btn.dataset.tunj_transport.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     document.getElementById('premi_kehadiran').value = btn.dataset.premi_kehadiran.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 }
+
+// pagination
+let currentPage = 1;
+const rowsPerPage = 5;
+
+function showPage(page) {
+    const rows = document.querySelectorAll(".table tbody tr");
+    const totalPages = Math.ceil(rows.length / rowsPerPage);
+
+    const pagination = document.querySelector(".pagination");
+
+    // 🔥 hide pagination jika hanya 1 halaman
+    if (totalPages <= 1) {
+        pagination.style.display = "none";
+    } else {
+        pagination.style.display = "flex"; // atau block sesuai CSS kamu
+    }
+
+    if (page < 1) page = 1;
+    if (page > totalPages) page = totalPages;
+
+    currentPage = page;
+
+    rows.forEach((row, index) => {
+        row.style.display =
+            index >= (page - 1) * rowsPerPage &&
+            index < page * rowsPerPage
+                ? ""
+                : "none";
+    });
+
+    document.getElementById("page-info").innerText =
+        `Page ${page} of ${totalPages}`;
+
+}
+
+function nextPage() {
+    showPage(currentPage + 1);
+}
+
+function prevPage() {
+    showPage(currentPage - 1);
+}
+
+// load pertama
+document.addEventListener("DOMContentLoaded", () => {
+    showPage(1);
+});
 
 </script>
 

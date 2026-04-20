@@ -319,6 +319,15 @@ function showPage(page) {
     const rows = document.querySelectorAll(".table tbody tr");
     const totalPages = Math.ceil(rows.length / rowsPerPage);
 
+    const pagination = document.querySelector(".pagination");
+
+    // 🔥 hide pagination jika hanya 1 halaman
+    if (totalPages <= 1) {
+        pagination.style.display = "none";
+    } else {
+        pagination.style.display = "flex"; // atau block sesuai CSS kamu
+    }
+
     if (page < 1) page = 1;
     if (page > totalPages) page = totalPages;
 
@@ -334,6 +343,7 @@ function showPage(page) {
 
     document.getElementById("page-info").innerText =
         `Page ${page} of ${totalPages}`;
+
 }
 
 function nextPage() {

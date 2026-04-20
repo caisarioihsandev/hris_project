@@ -8,7 +8,6 @@
     <button class="btn-add" onclick="openModal()">+ Tambah User</button>
 
     <div class="table-container">
-
         <table class="table">
             <thead>
                 <tr>
@@ -38,9 +37,13 @@
                 {% endfor %}
             </tbody>
         </table>
+
+        <div class="pagination">
+            <button onclick="prevPage()">Prev</button>
+            <span id="page-info"></span>
+            <button onclick="nextPage()">Next</button>
+        </div>
     </div>
-
-
 </div>
 
 
@@ -65,9 +68,7 @@
                 <button type="submit">Simpan</button>
                 <button onclick="closeModal()">Tutup</button>
             </div>
-        </form>
-
-        
+        </form>        
     </div>
 </div>
 
@@ -97,6 +98,45 @@ function editUser(btn) {
     document.getElementById('username').value = btn.dataset.username;
     document.getElementById('role').value = btn.dataset.role;
 }
+
+// pagination
+let currentPage = 1;
+const rowsPerPage = 5;
+
+function showPage(page) {
+    const rows = document.querySelectorAll(".table tbody tr");
+    const totalPages = Math.ceil(rows.length / rowsPerPage);
+
+    if (page < 1) page = 1;
+    if (page > totalPages) page = totalPages;
+
+    currentPage = page;
+
+    rows.forEach((row, index) => {
+        row.style.display =
+            index >= (page - 1) * rowsPerPage &&
+            index < page * rowsPerPage
+                ? ""
+                : "none";
+    });
+
+    document.getElementById("page-info").innerText =
+        `Page ${page} of ${totalPages}`;
+}
+
+function nextPage() {
+    showPage(currentPage + 1);
+}
+
+function prevPage() {
+    showPage(currentPage - 1);
+}
+
+// load pertama
+document.addEventListener("DOMContentLoaded", () => {
+    showPage(1);
+});
+
 </script>
 
 {% endblock %}
