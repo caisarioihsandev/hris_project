@@ -2,4 +2,5 @@ Flask
 gunicorn
 mysql-connector-python
 pymysql
+cryptography
 python-dotenv
