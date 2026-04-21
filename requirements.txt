@@ -1,7 +1,5 @@
 Flask
 gunicorn
 pymysql
-PyMySQL[rsa]
-# force rebuild
 cryptography
 python-dotenv
