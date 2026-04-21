@@ -35,9 +35,11 @@ class User:
                 SET username=%s, password=%s, role=%s
                 WHERE id=%s
             """, (data['username'], data['password'], data['role'], data['id']))
+        db.commit()
 
     @staticmethod
     def delete(id):
         db = get_db()
         with db.cursor() as cursor:
             cursor.execute("DELETE FROM users WHERE id=%s", (id,))
+        db.commit()
