@@ -48,7 +48,7 @@
                 data-keterangan="{{ row.keterangan }}">
                     Edit
                 </button>
-                <a href="/attendance/delete/{{ row.id }}" onclick="return confirm('Hapus data?')">Hapus</a>
+                <a href="/attendances/delete/{{ row.id }}" onclick="return confirm('Hapus data?')">Hapus</a>
             </td>
         </tr>
         {% endfor %}
@@ -60,7 +60,7 @@
     <div class="modal-content">
         <h3 id="modal-title">Input Absensi</h3>
 
-        <form method="POST" action="/attendance/save">
+        <form method="POST" action="/attendances/save">
 
             <input type="hidden" name="id" id="atd_id">
 
