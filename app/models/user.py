@@ -29,13 +29,15 @@ class User:
     @staticmethod
     def update(data):
         db = get_db()
-        db.execute("""
-            UPDATE users 
-            SET username=%s, password=%s, role=%s
-            WHERE id=%s
-        """, (data['username'], data['password'], data['role'], data['id']))
+        with db.cursor() as cursor:
+            cursor.execute("""
+                UPDATE users 
+                SET username=%s, password=%s, role=%s
+                WHERE id=%s
+            """, (data['username'], data['password'], data['role'], data['id']))
 
     @staticmethod
     def delete(id):
         db = get_db()
-        db.execute("DELETE FROM users WHERE id=%s", (id,))
+        with db.cursor() as cursor:
+            cursor.execute("DELETE FROM users WHERE id=%s", (id,))
