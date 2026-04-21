@@ -10,7 +10,7 @@ def register():
     if request.method == 'POST':
         data = request.form.to_dict()
 
-        if data['password'] != data['confirm']:
+        if data['password'] != data['confirm_password']:
             flash('Password tidak sama!')
             return redirect('/auth/register')
 
